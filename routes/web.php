@@ -17,69 +17,18 @@ use Illuminate\Support\Facades\Storage;
 |
 */
 
-Route::get('/', function () {
-    $images = DB::table('images')
-        ->select('*')
-        ->get();
+Route::get('/', 'ImagesController@actonIndex');
 
-    $viewImages = $images->all();
+Route::get('/about', 'ImagesController@actionAbout');
 
-    return view('welcome', ['imagesInView' => $viewImages]);
-});
+Route::get('/create', 'ImagesController@actionCreate');
 
-Route::get('/about', function () {
-    return view('about');
-});
+Route::get('/show/{id}', 'ImagesController@action');
 
-Route::get('/create', function () {
-    return view('create');
-});
+Route::get('/edit/{id}', 'ImagesController@actionEdit');
 
-Route::get('/show/{id}', function ($id) {
-    $image = DB::table('images')
-        ->select('*')
-        ->where('id', $id)
-        ->first();
+Route::post('/update/{id}', 'ImagesController@actionUpdate');
 
-    $image = $image->image;
+Route::post('/store', 'ImagesController@actionStore');
 
-    return view('show', ['imageInView' => $image]);
-});
-
-Route::get('/edit/{id}', function ($id) {
-    $image = DB::table('images')
-        ->select('*')
-        ->where('id', $id)
-        ->first();
-
-    return view('edit', ['imageInView' => $image]);
-});
-
-Route::post('/update/{id}', function (Request $request, $id) {
-    
-    $image = DB::table('images')
-        ->select('*')
-        ->where('id', $id)
-        ->first();
-    Storage::delete($image->image);
-    
-    $fileName = $request->image->store('uploads');
-    
-    DB::table('images')
-        ->where('id', $id)
-        ->update(['image' => $fileName]);
-
-        return redirect('/');
-});
-
-Route::post('/store', function (Request $request) {
-    // $image = $request->file('image');
-
-    $fileName = $request->image->store('uploads');
-
-    DB::table('images')->insert(
-        ['image' => $fileName]
-    );
-
-    return redirect('/');
-});
+Route::get('/delete/{id}', 'ImagesController@actionDelete');
