@@ -1,10 +1,8 @@
 <?php
 
-use Illuminate\Contracts\Cache\Store;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\ImagesController;
+use App\Http\Controllers\HomeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,18 +15,18 @@ use Illuminate\Support\Facades\Storage;
 |
 */
 
-Route::get('/', 'ImagesController@actonIndex');
+Route::get('/', [ImagesController::class, 'actionIndex']);
 
-Route::get('/about', 'ImagesController@actionAbout');
+Route::get('/about', [HomeController::class, 'actionAbout']);
 
-Route::get('/create', 'ImagesController@actionCreate');
+Route::get('/create', [ImagesController::class, 'actionCreate']);
 
-Route::get('/show/{id}', 'ImagesController@action');
+Route::get('/show/{id}', [ImagesController::class, 'actionShow']);
 
-Route::get('/edit/{id}', 'ImagesController@actionEdit');
+Route::get('/edit/{id}', [ImagesController::class, 'actionEdit']);
 
-Route::post('/update/{id}', 'ImagesController@actionUpdate');
+Route::post('/update/{id}', [ImagesController::class, 'actionUpdate']);
 
-Route::post('/store', 'ImagesController@actionStore');
+Route::post('/store', [ImagesController::class, 'actionStore']);
 
-Route::get('/delete/{id}', 'ImagesController@actionDelete');
+Route::get('/delete/{id}', [ImagesController::class, 'actionDelete']);

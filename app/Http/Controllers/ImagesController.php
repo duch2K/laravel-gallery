@@ -2,23 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\ImageService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 
 class ImagesController extends Controller {
-    function actionIndex() {
-        $images = DB::table('images')
-            ->select('*')
-            ->get();
-    
-        $viewImages = $images->all();
-    
-        return view('welcome', ['imagesInView' => $viewImages]);
+    private $imageService;
+
+    public function __construct(ImageService $imageService) {
+        $this->imageService = $imageService;
     }
 
-    function actionAbout() {
-        return view('about');
+    function actionIndex() {
+        $images = $this->imageService->all();
+    
+        return view('welcome', ['imagesInView' => $images]);
     }
 
     function actionCreate () {
@@ -26,61 +23,33 @@ class ImagesController extends Controller {
     }
 
     function actionShow($id) {
-        $image = DB::table('images')
-            ->select('*')
-            ->where('id', $id)
-            ->first();
+        $image = $this->imageService->getOne($id);
     
-        $image = $image->image;
-    
-        return view('show', ['imageInView' => $image]);
+        return view('show', ['imageInView' => $image->image]);
     }
 
     function actionEdit($id) {
-        $image = DB::table('images')
-            ->select('*')
-            ->where('id', $id)
-            ->first();
+        $image = $this->imageService->getOne($id);
     
         return view('edit', ['imageInView' => $image]);
     }
 
     function actionUpdate(Request $request, $id) {
-        $image = DB::table('images')
-            ->select('*')
-            ->where('id', $id)
-            ->first();
-        Storage::delete($image->image);
-        
-        $fileName = $request->image->store('uploads');
-        
-        DB::table('images')
-            ->where('id', $id)
-            ->update(['image' => $fileName]);
+        $image = $request->image;
+        $this->imageService->update($id, $image);
     
-            return redirect('/');
+        return redirect('/');
     }
 
     function actionStore(Request $request) {
-        $fileName = $request->image->store('uploads');
-    
-        DB::table('images')->insert(
-            ['image' => $fileName]
-        );
+        $image = $request->file('image');
+        $this->imageService->add($image);
     
         return redirect('/');
     }
 
     function actionDelete($id) {
-        $image = DB::table('images')
-            ->select('*')
-            ->where('id', $id)
-            ->first();
-        Storage::delete($image->image);
-    
-        DB::table('images')
-            ->where('id', $id)
-            ->delete();
+        $this->imageService->delete($id);
     
         return redirect('/');
     }
